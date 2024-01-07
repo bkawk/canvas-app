@@ -1,6 +1,42 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import initialData from "../data/initialData.json";
 
+interface Position {
+  x: number;
+  y: number;
+}
+
+interface Pin {
+  id: string;
+  type: string;
+}
+
+interface Node {
+  id: string;
+  type: string;
+  selected: boolean;
+  position: Position;
+  dataPins: {
+    input?: Pin[];
+    output?: Pin[];
+  };
+  execPins: {
+    input?: Pin[];
+    output?: Pin[];
+    error?: Pin[];
+  };
+}
+
+interface Edge {
+  fromPin: string;
+  toPin: string;
+}
+
+interface GraphData {
+  nodes: Node[];
+  edges: Edge[];
+}
+
 interface CanvasContextProps {
   zoomLevel: number;
   setZoomLevel: (zoomLevel: number) => void;
@@ -36,7 +72,7 @@ const CanvasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   } | null>(null);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const [isPanning, setIsPanning] = useState<boolean>(false);
-  const [activeGraph, setActiveGraph] = useState<any>(initialData);
+  const [activeGraph, setActiveGraph] = useState<GraphData>(initialData);
 
   return (
     <CanvasContext.Provider
