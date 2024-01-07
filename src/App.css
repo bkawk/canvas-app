@@ -46,3 +46,7 @@ header, footer {
 .canvas-container .main-canvas {
   z-index: 2; /* Higher z-index for main canvas */
 }
+
+.canvas-container .selection-canvas {
+  z-index: 3; /* Highest z-index for selection canvas */
+}

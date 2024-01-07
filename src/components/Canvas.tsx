@@ -11,11 +11,16 @@ import { useCanvasContext } from "../context/useCanvasContext";
 const Canvas = () => {
   const { zoomLevel, offset } = useCanvasContext();
 
+  const selectionCanvasRef = useRef<HTMLCanvasElement>(null);
   const mainCanvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const cursorPositions = useCursorPositions(mainCanvasRef, zoomLevel, offset);
-  const canvasSize = useCanvasResizer(mainCanvasRef);
+  const cursorPositions = useCursorPositions(
+    selectionCanvasRef,
+    zoomLevel,
+    offset
+  );
+  const canvasSize = useCanvasResizer(selectionCanvasRef);
 
   const {
     handleMouseDown,
@@ -25,13 +30,14 @@ const Canvas = () => {
     handleContextMenu,
   } = useCanvasInteractions(cursorPositions);
 
-  useCursorStyle(mainCanvasRef);
+  useCursorStyle(selectionCanvasRef);
   useDrawBackground(backgroundCanvasRef, zoomLevel, offset, canvasSize);
-  useDrawSelection(mainCanvasRef, zoomLevel, offset, canvasSize);
+
+  useDrawSelection(selectionCanvasRef, zoomLevel, offset, canvasSize);
   useDrawGraph(mainCanvasRef, zoomLevel, offset, canvasSize);
 
   useEffect(() => {
-    const canvas = mainCanvasRef.current;
+    const canvas = selectionCanvasRef.current;
     if (canvas) {
       const handleContextMenuListener = (event: Event) =>
         handleContextMenu(event as MouseEvent);
@@ -61,6 +67,13 @@ const Canvas = () => {
       <canvas
         ref={mainCanvasRef}
         className="main-canvas"
+        width={canvasSize.width}
+        height={canvasSize.height}
+      />
+      <canvas
+        ref={selectionCanvasRef}
+        className="selection-canvas"
+        style={{ position: "absolute", top: 0, left: 0, zIndex: 3 }}
         width={canvasSize.width}
         height={canvasSize.height}
         onMouseDown={handleMouseDown}
