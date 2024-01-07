@@ -1,5 +1,5 @@
 import React, { useRef, useCallback } from "react";
-import { useCanvasContext } from "../context/useCanvasContext";
+import { useCanvasContext, Node } from "../context/useCanvasContext";
 import {
   addToSelection,
   addMultipleToSelection,
@@ -52,7 +52,7 @@ const useCanvasInteractions = (
             addToSelection(clickedNode);
           } else {
             // Replace selection
-            addToSelection([clickedNode]);
+            addToSelection(clickedNode);
           }
         } else {
           isSelecting.current = true;
@@ -99,11 +99,11 @@ const useCanvasInteractions = (
     isSelecting.current = false;
 
     if (wasSelecting) {
-      const selectedNodes = findNodesInSelectionBox(
+      const selectedNodes: Node[] | null = findNodesInSelectionBox(
         selectionBoxStart.current,
         selectionBoxEnd.current
       );
-      addMultipleToSelection(selectedNodes);
+      if (selectedNodes) addMultipleToSelection(selectedNodes);
     }
   }, [setIsSelecting, setIsPanning]);
 

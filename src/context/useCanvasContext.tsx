@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import initialData from "../data/initialData.json";
 
-interface Position {
+export interface Position {
   x: number;
   y: number;
 }
@@ -11,7 +11,7 @@ interface Pin {
   type: string;
 }
 
-interface Node {
+export interface Node {
   id: string;
   type: string;
   selected: boolean;
