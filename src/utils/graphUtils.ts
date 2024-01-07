@@ -1,4 +1,4 @@
-export function findNodeAtClick(x: number, y: number) {
+export function findNodeAtClick({ x, y }: any) {
   console.log("Finding node at click:", x, y);
   return null;
 }

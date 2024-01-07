@@ -1,7 +1,6 @@
 import React, { useRef, useCallback } from "react";
 import { useCanvasContext } from "../context/useCanvasContext";
 import {
-  clearSelection,
   addToSelection,
   addMultipleToSelection,
 } from "../utils/selectionUtils";
@@ -41,13 +40,13 @@ const useCanvasInteractions = (
 
   const handleMouseDown = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {
+      const transformedPos = { ...cursorPositions.transformed };
       if (event.button === 2 || event.ctrlKey) {
         isPanning.current = true;
         setIsPanning(true);
         startPanPosition.current = { ...cursorPositions.raw }; // Use raw position for panning
       } else {
-        const { x, y } = cursorPositions.transformed;
-        const clickedNode = findNodeAtClick(x, y);
+        const clickedNode = findNodeAtClick(transformedPos);
         if (clickedNode) {
           if (event.shiftKey) {
             addToSelection(clickedNode);
@@ -57,10 +56,10 @@ const useCanvasInteractions = (
           }
         } else {
           isSelecting.current = true;
-          selectionBoxStart.current = { x, y };
+          selectionBoxStart.current = transformedPos;
           setIsSelecting(true);
-          setSelectionStart({ x, y });
-          setSelectionEnd({ x, y });
+          setSelectionStart(transformedPos);
+          setSelectionEnd(transformedPos);
         }
       }
     },
@@ -70,7 +69,6 @@ const useCanvasInteractions = (
       setSelectionEnd,
       setIsSelecting,
       setIsPanning,
-      // Include any other dependencies needed for your selection logic
     ]
   );
 
@@ -85,12 +83,9 @@ const useCanvasInteractions = (
         });
         startPanPosition.current = { ...cursorPositions.raw };
       } else if (isSelecting.current) {
-        selectionBoxEnd.current = {
-          ...cursorPositions.transformed,
-        };
-        setSelectionEnd({
-          ...cursorPositions.transformed,
-        });
+        const transformedPos = { ...cursorPositions.transformed };
+        selectionBoxEnd.current = transformedPos;
+        setSelectionEnd(transformedPos);
       }
     },
     [cursorPositions, offset, setOffset, setSelectionEnd]
@@ -114,28 +109,29 @@ const useCanvasInteractions = (
 
   const handleWheel = useCallback(
     (event: WheelEvent) => {
-      event.preventDefault(); // Prevent the default scroll behavior
+      event.preventDefault();
+      const zoomSpeed = 0.01;
+      const zoomIncrement = event.deltaY * -zoomSpeed;
 
-      const zoomSensitivity = 0.01; // Adjust this value to change zoom speed
-      const zoomIncrement = event.deltaY * -zoomSensitivity;
-
-      // Calculate new zoom level and clamp it within the desired range
       let newZoomLevel = zoomLevel + zoomIncrement;
       newZoomLevel = Math.max(newZoomLevel, 0.6);
       newZoomLevel = Math.min(newZoomLevel, 1.6);
 
       if (newZoomLevel !== zoomLevel) {
-        const canvasX = (cursorPositions.raw.x - offset.x) / zoomLevel;
-        const canvasY = (cursorPositions.raw.y - offset.y) / zoomLevel;
-
+        const { x: canvasX, y: canvasY } = cursorPositions.transformed;
         const newOffsetX = cursorPositions.raw.x - canvasX * newZoomLevel;
         const newOffsetY = cursorPositions.raw.y - canvasY * newZoomLevel;
-
         setZoomLevel(newZoomLevel);
         setOffset({ x: newOffsetX, y: newOffsetY });
       }
     },
-    [cursorPositions.raw, zoomLevel, setZoomLevel, offset, setOffset]
+    [
+      cursorPositions.raw,
+      cursorPositions.transformed,
+      zoomLevel,
+      setZoomLevel,
+      setOffset,
+    ]
   );
 
   const handleContextMenu = useCallback((event: MouseEvent) => {
