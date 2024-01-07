@@ -1,5 +1,11 @@
 import React, { useRef, useCallback } from "react";
 import { useCanvasContext } from "../context/useCanvasContext";
+import {
+  clearSelection,
+  addToSelection,
+  addMultipleToSelection,
+} from "../utils/selectionUtils";
+import { findNodeAtClick, findNodesInSelectionBox } from "../utils/graphUtils";
 
 interface CanvasInteractions {
   handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
@@ -30,6 +36,8 @@ const useCanvasInteractions = (
   const isSelecting = useRef(false);
   const isPanning = useRef(false);
   const startPanPosition = useRef({ x: 0, y: 0 });
+  const selectionBoxStart = useRef({ x: 0, y: 0 });
+  const selectionBoxEnd = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = useCallback(
     (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -38,10 +46,22 @@ const useCanvasInteractions = (
         setIsPanning(true);
         startPanPosition.current = { ...cursorPositions.raw }; // Use raw position for panning
       } else {
-        isSelecting.current = true;
-        setIsSelecting(true);
-        setSelectionStart({ ...cursorPositions.transformed }); // Use transformed position for selection
-        setSelectionEnd({ ...cursorPositions.transformed });
+        const { x, y } = cursorPositions.transformed;
+        const clickedNode = findNodeAtClick(x, y);
+        if (clickedNode) {
+          if (event.shiftKey) {
+            addToSelection(clickedNode);
+          } else {
+            // Replace selection
+            addToSelection([clickedNode]);
+          }
+        } else {
+          isSelecting.current = true;
+          selectionBoxStart.current = { x, y };
+          setIsSelecting(true);
+          setSelectionStart({ x, y });
+          setSelectionEnd({ x, y });
+        }
       }
     },
     [
@@ -50,6 +70,7 @@ const useCanvasInteractions = (
       setSelectionEnd,
       setIsSelecting,
       setIsPanning,
+      // Include any other dependencies needed for your selection logic
     ]
   );
 
@@ -64,19 +85,31 @@ const useCanvasInteractions = (
         });
         startPanPosition.current = { ...cursorPositions.raw };
       } else if (isSelecting.current) {
-        setSelectionEnd({ ...cursorPositions.transformed });
+        selectionBoxEnd.current = {
+          ...cursorPositions.transformed,
+        };
+        setSelectionEnd({
+          ...cursorPositions.transformed,
+        });
       }
     },
     [cursorPositions, offset, setOffset, setSelectionEnd]
   );
 
   const handleMouseUp = useCallback(() => {
-    if (isPanning.current) {
-      setIsPanning(false); // Update context state when panning stops
-    }
+    const wasSelecting = isSelecting.current;
+    setIsPanning(false);
     isPanning.current = false;
-    isSelecting.current = false;
     setIsSelecting(false);
+    isSelecting.current = false;
+
+    if (wasSelecting) {
+      const selectedNodes = findNodesInSelectionBox(
+        selectionBoxStart.current,
+        selectionBoxEnd.current
+      );
+      addMultipleToSelection(selectedNodes);
+    }
   }, [setIsSelecting, setIsPanning]);
 
   const handleWheel = useCallback(

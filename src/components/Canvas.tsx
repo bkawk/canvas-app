@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import useCanvasResizer from "../hooks/useCanvasResizer";
 import useCursorPositions from "../hooks/useCursorPositions";
 import useCursorStyle from "../hooks/useCursorStyle";
@@ -7,13 +7,14 @@ import useDrawBackground from "../hooks/useDrawBackground";
 import useDrawSelection from "../hooks/useDrawSelection";
 import useDrawGraph from "../hooks/useDrawGraph";
 import { useCanvasContext } from "../context/useCanvasContext";
+import useCanvasEventListeners from "../hooks/useCanvasEventListeners";
 
 const Canvas = () => {
-  const { zoomLevel, offset } = useCanvasContext();
-
   const selectionCanvasRef = useRef<HTMLCanvasElement>(null);
   const mainCanvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const { zoomLevel, offset } = useCanvasContext();
 
   const cursorPositions = useCursorPositions(
     selectionCanvasRef,
@@ -30,31 +31,12 @@ const Canvas = () => {
     handleContextMenu,
   } = useCanvasInteractions(cursorPositions);
 
+  useCanvasEventListeners(selectionCanvasRef, handleContextMenu, handleWheel);
   useCursorStyle(selectionCanvasRef);
-  useDrawBackground(backgroundCanvasRef, zoomLevel, offset, canvasSize);
 
+  useDrawBackground(backgroundCanvasRef, zoomLevel, offset, canvasSize);
   useDrawSelection(selectionCanvasRef, zoomLevel, offset, canvasSize);
   useDrawGraph(mainCanvasRef, zoomLevel, offset, canvasSize);
-
-  useEffect(() => {
-    const canvas = selectionCanvasRef.current;
-    if (canvas) {
-      const handleContextMenuListener = (event: Event) =>
-        handleContextMenu(event as MouseEvent);
-      const handleWheelListener = (event: Event) =>
-        handleWheel(event as WheelEvent);
-
-      canvas.addEventListener("contextmenu", handleContextMenuListener, {
-        passive: false,
-      });
-      canvas.addEventListener("wheel", handleWheelListener, { passive: false });
-
-      return () => {
-        canvas.removeEventListener("contextmenu", handleContextMenuListener);
-        canvas.removeEventListener("wheel", handleWheelListener);
-      };
-    }
-  }, [handleContextMenu, handleWheel]);
 
   return (
     <div className="canvas-container">
