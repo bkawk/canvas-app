@@ -58,23 +58,8 @@ const useDrawBackground = (
 
       // Draw large grid
       drawGrid(ctx, 200 * zoomLevel, "#161616", 1.5);
-
-      // Draw the circle
-      const radius = 50;
-      const circleCenterX = canvasSize.width / 2;
-      const circleCenterY = canvasSize.height / 2;
-      ctx.beginPath();
-      ctx.arc(
-        Math.floor(circleCenterX * zoomLevel + offset.x) + 0.5,
-        Math.floor(circleCenterY * zoomLevel + offset.y) + 0.5,
-        Math.floor(radius * zoomLevel),
-        0,
-        2 * Math.PI
-      );
-      ctx.fillStyle = "blue";
-      ctx.fill();
     }
-  }, [backgroundCanvasRef, drawGrid, canvasSize, zoomLevel, offset]);
+  }, [backgroundCanvasRef, drawGrid, canvasSize, zoomLevel]);
 
   useEffect(() => {
     drawBackground();

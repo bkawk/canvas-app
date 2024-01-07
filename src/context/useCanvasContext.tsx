@@ -32,9 +32,14 @@ interface Edge {
   toPin: string;
 }
 
-interface GraphData {
+export interface GraphData {
   nodes: Node[];
   edges: Edge[];
+}
+
+export interface Offset {
+  x: number;
+  y: number;
 }
 
 interface CanvasContextProps {

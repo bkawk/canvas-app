@@ -5,6 +5,7 @@ import useCursorStyle from "../hooks/useCursorStyle";
 import useCanvasInteractions from "../hooks/useCanvasInteractions";
 import useDrawBackground from "../hooks/useDrawBackground";
 import useDrawSelection from "../hooks/useDrawSelection";
+import useDrawGraph from "../hooks/useDrawGraph";
 import { useCanvasContext } from "../context/useCanvasContext";
 
 const Canvas = () => {
@@ -27,6 +28,7 @@ const Canvas = () => {
   useCursorStyle(mainCanvasRef);
   useDrawBackground(backgroundCanvasRef, zoomLevel, offset, canvasSize);
   useDrawSelection(mainCanvasRef, zoomLevel, offset, canvasSize);
+  useDrawGraph(mainCanvasRef, zoomLevel, offset, canvasSize);
 
   useEffect(() => {
     const canvas = mainCanvasRef.current;
