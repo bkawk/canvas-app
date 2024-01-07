@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
+import initialData from "../data/initialData.json";
 
-// Step 1: Define the Context Interface
 interface CanvasContextProps {
   zoomLevel: number;
   setZoomLevel: (zoomLevel: number) => void;
@@ -14,6 +14,8 @@ interface CanvasContextProps {
   setIsSelecting: (isSelecting: boolean) => void;
   isPanning: boolean;
   setIsPanning: (isPanning: boolean) => void;
+  activeGraph: any;
+  setActiveGraph: (activeGraph: any) => void;
 }
 
 const CanvasContext = createContext<CanvasContextProps | undefined>(undefined);
@@ -34,6 +36,7 @@ const CanvasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   } | null>(null);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const [isPanning, setIsPanning] = useState<boolean>(false);
+  const [activeGraph, setActiveGraph] = useState<any>(initialData);
 
   return (
     <CanvasContext.Provider
@@ -50,6 +53,8 @@ const CanvasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         setIsSelecting,
         isPanning,
         setIsPanning,
+        activeGraph,
+        setActiveGraph,
       }}
     >
       {children}
