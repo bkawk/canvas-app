@@ -1,4 +1,4 @@
-import { Node, Position } from "../context/useCanvasContext";
+import { Node, Position, Offset } from "../context/useCanvasContext";
 
 export function findNodeAtClick(position: Position): Node | null {
   const { x, y } = position;
@@ -22,3 +22,37 @@ export function deleteNode(node: Node): void {
   console.log("deleteNode");
   // TODO: Implement node deletion logic and also delete edges connected to this node
 }
+
+export const findPinPosition = (
+  pinId: string,
+  isOutput: boolean,
+  nodes: Node[],
+  zoomLevel: number,
+  offset: Offset,
+  nodeHeight: number
+) => {
+  const node = nodes.find((node) =>
+    (isOutput ? node.pins.output : node.pins.input)?.some(
+      (pin) => pin.id === pinId
+    )
+  );
+
+  if (!node) return null;
+
+  const pinArray = isOutput ? node.pins.output : node.pins.input;
+  if (!pinArray) return null;
+
+  const pinIndex = pinArray.findIndex((pin) => pin.id === pinId);
+  if (pinIndex === -1) return null;
+
+  const spacing = 20 * zoomLevel;
+  const radius = 6 * zoomLevel;
+  const posX =
+    node.position.x * zoomLevel + offset.x + pinIndex * spacing + radius;
+  const posY =
+    node.position.y * zoomLevel +
+    offset.y +
+    (isOutput ? nodeHeight * zoomLevel + radius * 2 : -(radius * 2));
+
+  return { x: posX, y: posY };
+};

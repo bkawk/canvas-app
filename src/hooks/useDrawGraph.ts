@@ -5,8 +5,8 @@ import {
   Node,
   InputPin,
   OutputPin,
-  Edge,
 } from "../context/useCanvasContext";
+import { drawEdges } from "../utils/drawEdges";
 import { CanvasSize } from "./useCanvasResizer";
 
 const useDrawGraph = (
@@ -62,57 +62,16 @@ const useDrawGraph = (
           ctx.fill();
         });
 
-        const findPinPosition = (pinId: string, isOutput: boolean) => {
-          const node = activeGraph.nodes.find((node: Node) =>
-            node.pins[isOutput ? "output" : "input"]?.some(
-              (pin) => pin.id === pinId
-            )
+        if (ctx) {
+          drawEdges(
+            ctx,
+            activeGraph.edges,
+            activeGraph.nodes,
+            zoomLevel,
+            offset,
+            nodeHeight
           );
-
-          if (!node) return null;
-
-          const pinIndex = node.pins[isOutput ? "output" : "input"].findIndex(
-            (pin: any) => pin.id === pinId
-          );
-          const spacing = 20 * zoomLevel;
-          const radius = 6 * zoomLevel;
-          const posX =
-            node.position.x * zoomLevel +
-            offset.x +
-            pinIndex * spacing +
-            radius;
-          const posY =
-            node.position.y * zoomLevel +
-            offset.y +
-            (isOutput ? nodeHeight * zoomLevel + radius * 2 : -(radius * 2));
-
-          return { x: posX, y: posY };
-        };
-
-        activeGraph.edges.forEach((edge: Edge) => {
-          const outputPos = findPinPosition(edge.fromPin, true);
-          const inputPos = findPinPosition(edge.toPin, false);
-
-          if (outputPos && inputPos) {
-            ctx.beginPath();
-            ctx.moveTo(outputPos.x, outputPos.y);
-            const controlPointX1 = (outputPos.x + inputPos.x) / 2;
-            const controlPointY1 = outputPos.y;
-            const controlPointX2 = (outputPos.x + inputPos.x) / 2;
-            const controlPointY2 = inputPos.y;
-            ctx.bezierCurveTo(
-              controlPointX1,
-              controlPointY1,
-              controlPointX2,
-              controlPointY2,
-              inputPos.x,
-              inputPos.y
-            );
-            ctx.strokeStyle = "#496F98";
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        });
+        }
       });
     }
   }, [canvasRef, activeGraph, zoomLevel, offset, canvasSize]);
