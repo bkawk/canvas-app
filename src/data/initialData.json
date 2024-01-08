@@ -4,7 +4,7 @@
       "id": "1",
       "type": "Input",
       "selected": false,
-      "position": { "x": 50, "y": 100 },
+      "position": { "x": 100, "y": -50 },
       "pins": {
         "output": [
           {
@@ -20,7 +20,7 @@
       "id": "2",
       "type": "Input",
       "selected": false,
-      "position": { "x": 50, "y": 200 },
+      "position": { "x": 400, "y": -50 },
       "pins": {
         "output": [
           {
@@ -65,7 +65,7 @@
       "id": "4",
       "type": "Result",
       "selected": false,
-      "position": { "x": 450, "y": 150 },
+      "position": { "x": 250, "y": 350 },
       "pins": {
         "input": [{ "id": "11", "type": "number" }]
       }
@@ -74,7 +74,7 @@
       "id": "5",
       "type": "ErrorHandler",
       "selected": false,
-      "position": { "x": 250, "y": 300 },
+      "position": { "x": 0, "y": 150 },
       "pins": {
         "input": [{ "id": "errorHandler_in", "type": "error" }]
       }
