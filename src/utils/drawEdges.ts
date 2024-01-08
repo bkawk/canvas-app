@@ -6,10 +6,10 @@ export const drawEdges = (
   edges: Edge[],
   nodes: Node[],
   zoomLevel: number,
-  offset: Offset,
-  nodeHeight: number
+  offset: Offset
 ) => {
   edges.forEach((edge: Edge) => {
+    const nodeHeight = 60;
     const outputPos = findPinPosition(
       edge.fromPin,
       true,
