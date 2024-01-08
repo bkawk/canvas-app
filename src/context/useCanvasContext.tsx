@@ -6,7 +6,12 @@ export interface Position {
   y: number;
 }
 
-interface Pin {
+interface InputPin {
+  id: string;
+  type: string;
+}
+
+interface OutputPin {
   id: string;
   type: string;
   solved: boolean;
@@ -19,9 +24,9 @@ export interface Node {
   selected: boolean;
   position: Position;
   pins: {
-    input?: Pin[];
-    output?: Pin[];
-    error?: Pin[];
+    input?: InputPin[];
+    output?: OutputPin[];
+    error?: OutputPin[];
   };
 }
 
