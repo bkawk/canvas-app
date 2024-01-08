@@ -1,5 +1,5 @@
 import React, { useRef, useCallback } from "react";
-import { useCanvasContext, Node } from "../context/useCanvasContext";
+import { useCanvasContext } from "../context/useCanvasContext";
 import {
   addToSelection,
   addMultipleToSelection,

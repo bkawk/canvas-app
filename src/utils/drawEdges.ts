@@ -30,10 +30,14 @@ export const drawEdges = (
     if (outputPos && inputPos) {
       ctx.beginPath();
       ctx.moveTo(outputPos.x, outputPos.y);
-      const controlPointX1 = (outputPos.x + inputPos.x) / 2;
+      const curveDistance = 40;
+      const controlPointX1 =
+        outputPos.x + curveDistance * Math.sign(inputPos.x - outputPos.x);
       const controlPointY1 = outputPos.y;
-      const controlPointX2 = (outputPos.x + inputPos.x) / 2;
+      const controlPointX2 =
+        inputPos.x - curveDistance * Math.sign(inputPos.x - outputPos.x);
       const controlPointY2 = inputPos.y;
+
       ctx.bezierCurveTo(
         controlPointX1,
         controlPointY1,
