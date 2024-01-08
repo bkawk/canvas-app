@@ -11,7 +11,7 @@ interface InputPin {
   type: string;
 }
 
-interface OutputPin {
+export interface OutputPin {
   id: string;
   type: string;
   solved: boolean;
@@ -21,6 +21,7 @@ interface OutputPin {
 export interface Node {
   id: string;
   type: string;
+  function?: string;
   selected: boolean;
   position: Position;
   pins: {
@@ -30,7 +31,7 @@ export interface Node {
   };
 }
 
-interface Edge {
+export interface Edge {
   fromPin: string;
   toPin: string;
 }
