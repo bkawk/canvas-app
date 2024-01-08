@@ -47,8 +47,20 @@ export const findPinPosition = (
 
   const spacing = 20 * zoomLevel;
   const radius = 6 * zoomLevel;
-  const posX =
-    node.position.x * zoomLevel + offset.x + pinIndex * spacing + radius;
+  const nodeWidth = 150 * zoomLevel;
+
+  const calculatePinXPosition = (index: number, totalPins: number) => {
+    const totalSpacing = (totalPins - 1) * spacing;
+    const pinsWidth = totalPins * radius * 2 + totalSpacing;
+    const start =
+      node.position.x * zoomLevel +
+      offset.x +
+      (nodeWidth - pinsWidth) / 2 +
+      radius;
+    return start + index * (spacing + radius * 2);
+  };
+
+  const posX = calculatePinXPosition(pinIndex, pinArray.length);
   const posY =
     node.position.y * zoomLevel +
     offset.y +
