@@ -99,7 +99,7 @@ const useCanvasInteractions = (
     isSelecting.current = false;
 
     if (wasSelecting) {
-      const selectedNodes: Node[] | null = findNodesInSelectionBox(
+      const selectedNodes = findNodesInSelectionBox(
         selectionBoxStart.current,
         selectionBoxEnd.current
       );

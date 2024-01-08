@@ -1,100 +1,101 @@
 {
   "nodes": [
     {
-      "id": "input1",
+      "id": "1",
       "type": "Input",
       "selected": false,
       "position": { "x": 50, "y": 100 },
-      "dataPins": {
-        "output": [{ "id": "input1_out", "type": "number" }]
-      },
-      "execPins": {
-        "output": [{ "id": "input1_exec_out", "type": "exec" }]
+      "pins": {
+        "output": [
+          {
+            "id": "6",
+            "type": "number",
+            "solved": false,
+            "value": 2
+          }
+        ]
       }
     },
     {
-      "id": "input2",
+      "id": "2",
       "type": "Input",
       "selected": false,
       "position": { "x": 50, "y": 200 },
-      "dataPins": {
-        "output": [{ "id": "input2_out", "type": "number" }]
-      },
-      "execPins": {
-        "output": [{ "id": "input2_exec_out", "type": "exec" }]
+      "pins": {
+        "output": [
+          {
+            "id": "8",
+            "type": "number",
+            "solved": false,
+            "value": 2
+          }
+        ]
       }
     },
     {
-      "id": "multiply",
+      "id": "3",
       "type": "Multiply",
+      "function": "multiplyAxB",
       "selected": false,
       "position": { "x": 250, "y": 150 },
-      "dataPins": {
+      "pins": {
         "input": [
-          { "id": "multiply_in1", "type": "number" },
-          { "id": "multiply_in2", "type": "number" }
+          { "id": "7", "type": "number" },
+          { "id": "9", "type": "number" }
         ],
-        "output": [{ "id": "multiply_out", "type": "number" }]
-      },
-      "execPins": {
-        "input": [{ "id": "multiply_exec_in", "type": "exec" }],
-        "output": [{ "id": "multiply_exec_out", "type": "exec" }],
-        "error": [{ "id": "multiply_error", "type": "exec" }]
+        "output": [
+          {
+            "id": "10",
+            "type": "number",
+            "solved": false,
+            "value": 4
+          }
+        ],
+        "error": [
+          {
+            "id": "12",
+            "type": "string",
+            "solved": false,
+            "value": "error 401"
+          }
+        ]
       }
     },
     {
-      "id": "result",
+      "id": "4",
       "type": "Result",
       "selected": false,
       "position": { "x": 450, "y": 150 },
-      "dataPins": {
-        "input": [{ "id": "result_in", "type": "number" }]
-      },
-      "execPins": {
-        "input": [{ "id": "result_exec_in", "type": "exec" }]
+      "pins": {
+        "input": [{ "id": "11", "type": "number" }]
       }
     },
     {
-      "id": "errorHandler",
+      "id": "5",
       "type": "ErrorHandler",
       "selected": false,
       "position": { "x": 250, "y": 300 },
-      "dataPins": {
+      "pins": {
         "input": [{ "id": "errorHandler_in", "type": "error" }]
-      },
-      "execPins": {
-        "input": [{ "id": "errorHandler_exec_in", "type": "exec" }]
       }
     }
   ],
   "edges": [
     {
-      "fromPin": "input1_exec_out",
-      "toPin": "multiply_exec_in"
+      "fromPin": "6",
+      "toPin": "7"
     },
     {
-      "fromPin": "input1_out",
-      "toPin": "multiply_in1"
+      "fromPin": "8",
+      "toPin": "9"
     },
     {
-      "fromPin": "input2_exec_out",
-      "toPin": "multiply_exec_in"
+      "fromPin": "10",
+      "toPin": "11"
     },
     {
-      "fromPin": "input2_out",
-      "toPin": "multiply_in2"
-    },
-    {
-      "fromPin": "multiply_exec_out",
-      "toPin": "result_exec_in"
-    },
-    {
-      "fromPin": "multiply_out",
-      "toPin": "result_in"
-    },
-    {
-      "fromPin": "multiply_error",
-      "toPin": "errorHandler_exec_in"
+      "fromPin": "12",
+      "toPin": "5"
     }
   ]
 }

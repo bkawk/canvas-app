@@ -9,6 +9,8 @@ export interface Position {
 interface Pin {
   id: string;
   type: string;
+  solved: boolean;
+  value: any;
 }
 
 export interface Node {
@@ -16,11 +18,7 @@ export interface Node {
   type: string;
   selected: boolean;
   position: Position;
-  dataPins: {
-    input?: Pin[];
-    output?: Pin[];
-  };
-  execPins: {
+  pins: {
     input?: Pin[];
     output?: Pin[];
     error?: Pin[];
