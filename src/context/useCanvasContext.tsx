@@ -6,7 +6,7 @@ export interface Position {
   y: number;
 }
 
-interface InputPin {
+export interface InputPin {
   id: string;
   type: string;
 }
