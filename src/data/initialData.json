@@ -11,7 +11,7 @@
             "id": "6",
             "type": "number",
             "solved": false,
-            "value": 2
+            "value": 5
           }
         ]
       }
@@ -36,7 +36,7 @@
       "id": "3",
       "type": "Multiply",
       "function": "multiplyAxB",
-      "selected": false,
+      "selected": true,
       "position": { "x": 250, "y": 150 },
       "pins": {
         "input": [
@@ -48,22 +48,20 @@
             "id": "10",
             "type": "number",
             "solved": false,
-            "value": 4
-          }
-        ],
-        "error": [
+            "value": 0
+          },
           {
             "id": "12",
             "type": "string",
             "solved": false,
-            "value": "error 401"
+            "error": "Error 401"
           }
         ]
       }
     },
     {
       "id": "4",
-      "type": "Result",
+      "type": "Log",
       "selected": false,
       "position": { "x": 250, "y": 350 },
       "pins": {
@@ -72,11 +70,11 @@
     },
     {
       "id": "5",
-      "type": "ErrorHandler",
+      "type": "Error Handler",
       "selected": false,
-      "position": { "x": 0, "y": 150 },
+      "position": { "x": 550, "y": 350 },
       "pins": {
-        "input": [{ "id": "errorHandler_in", "type": "error" }]
+        "input": [{ "id": "13", "type": "error" }]
       }
     }
   ],
@@ -95,7 +93,7 @@
     },
     {
       "fromPin": "12",
-      "toPin": "5"
+      "toPin": "13"
     }
   ]
 }

@@ -23,6 +23,8 @@ const useCanvasInteractions = (
   cursorPositions: CursorPositions
 ): CanvasInteractions => {
   const {
+    activeGraph,
+    setActiveGraph,
     zoomLevel,
     setZoomLevel,
     offset,
@@ -46,13 +48,14 @@ const useCanvasInteractions = (
         setIsPanning(true);
         startPanPosition.current = { ...cursorPositions.raw }; // Use raw position for panning
       } else {
-        const clickedNode = findNodeAtClick(transformedPos);
+        const clickedNode = findNodeAtClick(transformedPos, activeGraph?.nodes);
         if (clickedNode) {
           if (event.shiftKey) {
-            addToSelection(clickedNode);
+            addToSelection(clickedNode, setActiveGraph, activeGraph);
           } else {
             // Replace selection
-            addToSelection(clickedNode);
+            // TODO: clear other selections
+            addToSelection(clickedNode, setActiveGraph, activeGraph);
           }
         } else {
           isSelecting.current = true;
@@ -69,6 +72,8 @@ const useCanvasInteractions = (
       setSelectionEnd,
       setIsSelecting,
       setIsPanning,
+      setActiveGraph,
+      activeGraph,
     ]
   );
 

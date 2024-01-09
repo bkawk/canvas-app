@@ -1,4 +1,10 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
 import initialData from "../data/initialData.json";
 
 export interface Position {
@@ -15,6 +21,14 @@ export interface OutputPin {
   id: string;
   type: string;
   solved: boolean;
+  value?: any;
+  error?: any;
+}
+
+export interface ErrorPin {
+  id: string;
+  type: string;
+  solved: boolean;
   value: any;
 }
 
@@ -27,7 +41,6 @@ export interface Node {
   pins: {
     input?: InputPin[];
     output?: OutputPin[];
-    error?: OutputPin[];
   };
 }
 
@@ -49,39 +62,41 @@ export interface Offset {
 interface CanvasContextProps {
   zoomLevel: number;
   setZoomLevel: (zoomLevel: number) => void;
-  offset: { x: number; y: number };
-  setOffset: (offset: { x: number; y: number }) => void;
-  selectionStart: { x: number; y: number } | null;
-  setSelectionStart: (selectionStart: { x: number; y: number } | null) => void;
-  selectionEnd: { x: number; y: number } | null;
-  setSelectionEnd: (selectionEnd: { x: number; y: number } | null) => void;
+  offset: Offset;
+  setOffset: (offset: Offset) => void;
+  selectionStart: Position | null;
+  setSelectionStart: (selectionStart: Position | null) => void;
+  selectionEnd: Position | null;
+  setSelectionEnd: (selectionEnd: Position | null) => void;
   isSelecting: boolean;
   setIsSelecting: (isSelecting: boolean) => void;
   isPanning: boolean;
   setIsPanning: (isPanning: boolean) => void;
-  activeGraph: any;
-  setActiveGraph: (activeGraph: any) => void;
+  activeGraph: GraphData;
+  setActiveGraph: (activeGraph: GraphData) => void;
 }
 
 const CanvasContext = createContext<CanvasContextProps | undefined>(undefined);
 
 const CanvasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [zoomLevel, setZoomLevel] = useState<number>(1);
-  const [offset, setOffset] = useState<{ x: number; y: number }>({
+  const [offset, setOffset] = useState<Offset>({
     x: 0,
     y: 0,
   });
-  const [selectionStart, setSelectionStart] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-  const [selectionEnd, setSelectionEnd] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const [selectionStart, setSelectionStart] = useState<Position | null>(null);
+  const [selectionEnd, setSelectionEnd] = useState<Position | null>(null);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const [isPanning, setIsPanning] = useState<boolean>(false);
-  const [activeGraph, setActiveGraph] = useState<GraphData>(initialData);
+
+  const [activeGraph, setActiveGraph] = useState<GraphData>(() => {
+    const savedData = localStorage.getItem("activeGraph");
+    return savedData ? JSON.parse(savedData) : initialData;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("activeGraph", JSON.stringify(activeGraph));
+  }, [activeGraph]);
 
   return (
     <CanvasContext.Provider

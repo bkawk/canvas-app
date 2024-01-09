@@ -1,9 +1,25 @@
 import { Node, Position, Offset } from "../context/useCanvasContext";
 
-export function findNodeAtClick(position: Position): Node | null {
+export function findNodeAtClick(
+  position: Position,
+  nodes: Node[]
+): Node | null {
   const { x, y } = position;
-  console.log("Finding node at click:", x, y);
-  // Implementation to find and return the node at the given position
+  // TODO: move this size to a config or the node definition
+  const nodeWidth = 150;
+  const nodeHeight = 60;
+
+  for (const node of nodes) {
+    if (
+      x >= node.position.x &&
+      x <= node.position.x + nodeWidth &&
+      y >= node.position.y &&
+      y <= node.position.y + nodeHeight
+    ) {
+      return node;
+    }
+  }
+
   return null;
 }
 

@@ -46,7 +46,16 @@ export const drawEdges = (
         inputPos.x,
         inputPos.y
       );
-      ctx.strokeStyle = "#496F98";
+
+      // Check if the output pin has an error
+      const fromNode = nodes.find((node) =>
+        node.pins.output?.some((pin) => pin.id === edge.fromPin)
+      );
+      const hasError = fromNode?.pins.output?.find(
+        (pin) => pin.id === edge.fromPin
+      )?.error;
+
+      ctx.strokeStyle = hasError ? "#C62828" : "#496F98";
       ctx.lineWidth = 0.5;
       ctx.stroke();
     }

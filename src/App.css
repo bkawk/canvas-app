@@ -1,52 +1,68 @@
 .App {
   display: grid;
-  grid-template-rows: auto 1fr auto; /* Header, content, footer */
+  grid-template-rows: auto 1fr auto; 
   grid-template-columns: 100%;
   min-height: 100vh;
 }
 
 header, footer {
-  padding: 1rem;
-  background-color: #f8f8f8;
-  text-align: center;
+  padding: 0.2rem;
+  background-color: #262626;
+  text-align: left;
+  color: rgba(189, 189, 191, 0.8);
+  font-size: 12px;
+  padding: 0 1rem;
+}
+
+body {
+  background-color: #262626;
 }
 
 .content-container {
   display: grid;
-  grid-template-columns: 200px 1fr 400px; /* Left sidebar, canvas, right sidebar */
-  grid-gap: 1rem; /* Space between columns */
-  padding: 1rem; /* Add padding around the content */
+  grid-template-columns: 200px 1fr 400px; 
+  grid-gap: 1rem;
+  padding: 0 1rem ;
 }
 
 .left-sidebar, .right-sidebar {
-  background-color: #e8e8e8;
+  background-color: #262626;
   padding: 1rem;
+  border-radius: 8px;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+  color: rgba(189, 189, 191, 0.8);
 }
 
 .canvas-container {
-  position: relative; /* Acts as a container for absolute children */
-  grid-area: 2 / 2 / 3 / 3; /* Center grid cell */
-  width: 100%; /* Fill the grid cell */
+  position: relative; 
+  grid-area: 2 / 2 / 3 / 3; 
+  width: 100%; 
   height: 100%;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  overflow: hidden;
+
 }
 
 .canvas-container canvas {
-  position: absolute; /* Position canvases absolutely within the container */
+  position: absolute; 
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 
 .canvas-container .background-canvas {
-  z-index: 1; /* Lower z-index for background */
+  z-index: 1; 
 }
 
 .canvas-container .main-canvas {
-  z-index: 2; /* Higher z-index for main canvas */
+  z-index: 2; 
 }
 
 .canvas-container .selection-canvas {
-  z-index: 3; /* Highest z-index for selection canvas */
+  z-index: 3; 
 }

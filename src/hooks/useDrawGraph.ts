@@ -4,6 +4,7 @@ import { drawNodes } from "../utils/drawNodes";
 import { drawPins } from "../utils/drawPins";
 import { drawEdges } from "../utils/drawEdges";
 import { CanvasSize } from "./useCanvasResizer";
+import useSolveGraph from "../hooks/useSolveGraph";
 
 const useDrawGraph = (
   canvasRef: RefObject<HTMLCanvasElement>,
@@ -12,6 +13,7 @@ const useDrawGraph = (
   canvasSize: CanvasSize
 ) => {
   const { activeGraph } = useCanvasContext();
+  const solveGraph = useSolveGraph();
 
   const drawGraph = useCallback(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -35,6 +37,10 @@ const useDrawGraph = (
   useEffect(() => {
     drawGraph();
   }, [drawGraph]);
+
+  useEffect(() => {
+    solveGraph();
+  }, [activeGraph, solveGraph]);
 
   return drawGraph;
 };

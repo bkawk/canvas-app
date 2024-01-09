@@ -1,5 +1,5 @@
 // hooks/useSolveGraph.ts
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import {
   useCanvasContext,
   Node,
@@ -15,8 +15,38 @@ const functionMap: Record<NodeFunctionName, (inputs: number[]) => number> = {
   multiplyAxB: multiplyAxB,
 };
 
+function deepEqual<T>(obj1: T, obj2: T): boolean {
+  if (obj1 === obj2) {
+    return true;
+  }
+
+  if (
+    typeof obj1 !== "object" ||
+    obj1 === null ||
+    typeof obj2 !== "object" ||
+    obj2 === null
+  ) {
+    return false;
+  }
+
+  const keys1 = Object.keys(obj1) as (keyof T)[];
+  const keys2 = Object.keys(obj2) as (keyof T)[];
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  for (let key of keys1) {
+    if (!keys2.includes(key) || !deepEqual(obj1[key] as T, obj2[key] as T)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 const useSolveGraph = () => {
   const { activeGraph, setActiveGraph } = useCanvasContext();
+  const previousGraphRef = useRef<GraphData | undefined>(undefined);
 
   const executeNode = useCallback(
     (node: Node, nodes: Node[]): void => {
@@ -59,7 +89,13 @@ const useSolveGraph = () => {
       }
     });
 
-    setActiveGraph(graphCopy);
+    if (
+      previousGraphRef.current === undefined ||
+      !deepEqual<GraphData>(previousGraphRef.current, graphCopy)
+    ) {
+      setActiveGraph(graphCopy);
+      previousGraphRef.current = graphCopy;
+    }
   }, [activeGraph, executeNode, setActiveGraph]);
 
   return solveGraph;
