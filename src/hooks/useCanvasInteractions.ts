@@ -1,10 +1,5 @@
-import React, { useRef, useCallback } from "react";
+import { useRef, useCallback } from "react";
 import { useCanvasContext } from "../context/useCanvasContext";
-import {
-  addToSelection,
-  addMultipleToSelection,
-} from "../utils/selectionUtils";
-import { findNodeAtClick, findNodesInSelectionBox } from "../utils/graphUtils";
 
 interface CanvasInteractions {
   handleMouseDown: (event: MouseEvent) => void;
@@ -12,6 +7,8 @@ interface CanvasInteractions {
   handleMouseUp: (event: MouseEvent) => void;
   handleWheel: (event: WheelEvent) => void;
   handleContextMenu: (event: MouseEvent) => void;
+  handleKeyDown: (event: KeyboardEvent) => void;
+  handleKeyUp: (event: KeyboardEvent) => void;
 }
 
 interface CursorPositions {
@@ -25,7 +22,7 @@ const useCanvasInteractions = (
   cursorPositions: CursorPositions
 ): CanvasInteractions => {
   const { canvasState, setCanvasState } = useCanvasContext();
-  const { activeGraph, zoomLevel } = canvasState;
+  const { zoomLevel } = canvasState;
 
   const mouseButton = useRef<"left" | "right" | null>(null);
   const startPanPosition = useRef({ x: 0, y: 0 });
@@ -51,20 +48,20 @@ const useCanvasInteractions = (
       if (buttonPressed === "right") {
         startPanPosition.current = { ...cursorPositions.raw };
       } else {
-        const clickedNode = findNodeAtClick(transformedPos, activeGraph.nodes);
-        if (!clickedNode) {
-          mouseButton.current = "left";
-          selectionBoxStart.current = transformedPos;
-          setCanvasState((prevState) => ({
-            ...prevState,
-            selectionStart: transformedPos,
-            selectionEnd: transformedPos,
-          }));
-        }
-        // Implement node selection logic if clickedNode is not null
+        mouseButton.current = "left";
+        selectionBoxStart.current = transformedPos;
+        setCanvasState((prevState) => ({
+          ...prevState,
+          dragStart: transformedPos,
+          dragEnd: transformedPos,
+        }));
       }
+      setCanvasState((prevState) => ({
+        ...prevState,
+        downTime: roundToTwoDecimals(event.timeStamp),
+      }));
     },
-    [cursorPositions, setCanvasState, activeGraph]
+    [cursorPositions, setCanvasState]
   );
 
   const handleMouseMove = useCallback(() => {
@@ -87,18 +84,22 @@ const useCanvasInteractions = (
       selectionBoxEnd.current = transformedPos;
       setCanvasState((prevState) => ({
         ...prevState,
-        selectionEnd: transformedPos,
+        dragEnd: transformedPos,
       }));
     }
   }, [cursorPositions, setCanvasState, canvasState.mouseButton]);
 
-  const handleMouseUp = useCallback(() => {
-    setCanvasState((prevState) => ({
-      ...prevState,
-      mouseButton: null,
-    }));
-    mouseButton.current = null;
-  }, [setCanvasState]);
+  const handleMouseUp = useCallback(
+    (event: MouseEvent) => {
+      setCanvasState((prevState) => ({
+        ...prevState,
+        mouseButton: null,
+        upTime: roundToTwoDecimals(event.timeStamp),
+      }));
+      mouseButton.current = null;
+    },
+    [setCanvasState]
+  );
 
   const handleWheel = useCallback(
     (event: WheelEvent) => {
@@ -127,8 +128,44 @@ const useCanvasInteractions = (
           },
         }));
       }
+      setCanvasState((prevState) => ({
+        ...prevState,
+        upTime: event.timeStamp,
+      }));
     },
     [cursorPositions, setCanvasState, zoomLevel]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      const keyMap: { [key: string]: "escape" | "shift" | "backspace" | null } =
+        {
+          Escape: "escape",
+          Shift: "shift",
+          Backspace: "backspace",
+        };
+      const keyPressed = keyMap[event.key] || null;
+
+      if (keyPressed) {
+        setCanvasState((prevState) => ({
+          ...prevState,
+          keyPressed: keyPressed,
+          downTime: roundToTwoDecimals(event.timeStamp),
+        }));
+      }
+    },
+    [setCanvasState]
+  );
+
+  const handleKeyUp = useCallback(
+    (event: KeyboardEvent) => {
+      setCanvasState((prevState) => ({
+        ...prevState,
+        keyPressed: null,
+        upTime: roundToTwoDecimals(event.timeStamp),
+      }));
+    },
+    [setCanvasState]
   );
 
   const handleContextMenu = useCallback((event: MouseEvent) => {
@@ -141,6 +178,8 @@ const useCanvasInteractions = (
     handleMouseUp,
     handleWheel,
     handleContextMenu,
+    handleKeyDown,
+    handleKeyUp,
   };
 };
 

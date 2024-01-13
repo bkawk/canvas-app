@@ -8,13 +8,14 @@ import useDrawSelection from "../hooks/useDrawSelection";
 import useDrawGraph from "../hooks/useDrawGraph";
 import { useCanvasContext } from "../context/useCanvasContext";
 import useCanvasEventListeners from "../hooks/useCanvasEventListeners";
+import useGraphEditor from "../hooks/useGraphEditor";
 
 const Canvas = () => {
   const selectionCanvasRef = useRef<HTMLCanvasElement>(null);
   const mainCanvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { canvasState } = useCanvasContext();
+  const { canvasState, setCanvasState } = useCanvasContext();
   const { zoomLevel, offset } = canvasState;
 
   const cursorPositions = useCursorPositions(
@@ -30,6 +31,8 @@ const Canvas = () => {
     handleMouseUp,
     handleWheel,
     handleContextMenu,
+    handleKeyDown,
+    handleKeyUp,
   } = useCanvasInteractions(cursorPositions);
 
   useCanvasEventListeners(
@@ -38,13 +41,17 @@ const Canvas = () => {
     handleWheel,
     handleMouseDown,
     handleMouseMove,
-    handleMouseUp
+    handleMouseUp,
+    handleKeyDown,
+    handleKeyUp
   );
-  useCursorStyle(selectionCanvasRef);
 
+  useCursorStyle(selectionCanvasRef);
   useDrawBackground(backgroundCanvasRef, zoomLevel, offset, canvasSize);
   useDrawSelection(selectionCanvasRef, zoomLevel, offset, canvasSize);
   useDrawGraph(mainCanvasRef, zoomLevel, offset, canvasSize);
+
+  useGraphEditor(canvasState, setCanvasState);
 
   return (
     <div className="canvas-container">

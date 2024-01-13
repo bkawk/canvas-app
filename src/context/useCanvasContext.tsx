@@ -59,14 +59,16 @@ export interface Offset {
   y: number;
 }
 
-interface CanvasContextProps {
+export interface CanvasContextProps {
   zoomLevel: number;
   offset: Offset;
   activeGraph: GraphData;
-
   mouseButton: "left" | "right" | null;
-  selectionStart: Position | null;
-  selectionEnd: Position | null;
+  dragStart: Position;
+  dragEnd: Position;
+  downTime: number | null;
+  upTime: number | null;
+  keyPressed: "escape" | "shift" | "backspace" | null;
 }
 
 const CanvasContext = createContext<
@@ -85,8 +87,11 @@ const CanvasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       ? JSON.parse(localStorage.getItem("activeGraph") as string)
       : initialData,
     mouseButton: null,
-    selectionStart: null,
-    selectionEnd: null,
+    dragStart: { x: 0, y: 0 },
+    dragEnd: { x: 0, y: 0 },
+    downTime: null,
+    upTime: null,
+    keyPressed: null,
   });
 
   useEffect(() => {

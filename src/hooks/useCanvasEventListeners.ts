@@ -1,5 +1,4 @@
 import { useEffect, RefObject } from "react";
-import { clearSelection } from "../utils/selectionUtils";
 
 function throttle(callback: (...args: any[]) => void, delay: number) {
   let lastCall = 0;
@@ -17,7 +16,9 @@ const useCanvasEventListeners = (
   handleWheel: (event: WheelEvent) => void,
   handleMouseDown: (event: MouseEvent) => void,
   handleMouseMove: (event: MouseEvent) => void,
-  handleMouseUp: (event: MouseEvent) => void
+  handleMouseUp: (event: MouseEvent) => void,
+  handleKeyDown: (event: KeyboardEvent) => void,
+  handleKeyUp: (event: KeyboardEvent) => void
 ) => {
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -49,17 +50,14 @@ const useCanvasEventListeners = (
   ]);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        clearSelection();
-      }
-    };
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [handleKeyDown, handleKeyUp]);
 
   return null;
 };

@@ -18,7 +18,7 @@ const useDrawSelection = (
   canvasSize: CanvasSize
 ) => {
   const { canvasState } = useCanvasContext();
-  const { selectionStart, selectionEnd, mouseButton } = canvasState;
+  const { dragStart, dragEnd, mouseButton } = canvasState;
 
   const drawSelection = useCallback(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -26,12 +26,12 @@ const useDrawSelection = (
       // Clear any previous drawing on the canvas
       ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
 
-      if (mouseButton === "left" && selectionStart && selectionEnd) {
+      if (mouseButton === "left" && dragStart && dragEnd) {
         // Calculate scaled positions
-        const startX = selectionStart.x * zoomLevel + offset.x;
-        const startY = selectionStart.y * zoomLevel + offset.y;
-        const endX = selectionEnd.x * zoomLevel + offset.x;
-        const endY = selectionEnd.y * zoomLevel + offset.y;
+        const startX = dragStart.x * zoomLevel + offset.x;
+        const startY = dragStart.y * zoomLevel + offset.y;
+        const endX = dragEnd.x * zoomLevel + offset.x;
+        const endY = dragEnd.y * zoomLevel + offset.y;
 
         // Draw white dashed selection rectangle
         ctx.setLineDash([5, 5]);
@@ -44,8 +44,8 @@ const useDrawSelection = (
     }
   }, [
     canvasRef,
-    selectionStart,
-    selectionEnd,
+    dragStart,
+    dragEnd,
     mouseButton,
     zoomLevel,
     offset,
