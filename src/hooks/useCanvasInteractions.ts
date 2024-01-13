@@ -7,9 +7,9 @@ import {
 import { findNodeAtClick, findNodesInSelectionBox } from "../utils/graphUtils";
 
 interface CanvasInteractions {
-  handleMouseDown: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseMove: (event: React.MouseEvent<HTMLCanvasElement>) => void;
-  handleMouseUp: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  handleMouseDown: (event: MouseEvent) => void;
+  handleMouseMove: (event: MouseEvent) => void;
+  handleMouseUp: (event: MouseEvent) => void;
   handleWheel: (event: WheelEvent) => void;
   handleContextMenu: (event: MouseEvent) => void;
 }
@@ -19,124 +19,116 @@ interface CursorPositions {
   transformed: { x: number; y: number };
 }
 
+const roundToTwoDecimals = (num: number) => Math.round(num * 100) / 100;
+
 const useCanvasInteractions = (
   cursorPositions: CursorPositions
 ): CanvasInteractions => {
-  const {
-    activeGraph,
-    setActiveGraph,
-    zoomLevel,
-    setZoomLevel,
-    offset,
-    setOffset,
-    setSelectionStart,
-    setSelectionEnd,
-    setIsSelecting,
-    setIsPanning,
-  } = useCanvasContext();
-  const isSelecting = useRef(false);
-  const isPanning = useRef(false);
+  const { canvasState, setCanvasState } = useCanvasContext();
+  const { activeGraph, zoomLevel } = canvasState;
+
+  const mouseButton = useRef<"left" | "right" | null>(null);
   const startPanPosition = useRef({ x: 0, y: 0 });
   const selectionBoxStart = useRef({ x: 0, y: 0 });
   const selectionBoxEnd = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = useCallback(
-    (event: React.MouseEvent<HTMLCanvasElement>) => {
-      const transformedPos = { ...cursorPositions.transformed };
-      if (event.button === 2 || event.ctrlKey) {
-        isPanning.current = true;
-        setIsPanning(true);
-        startPanPosition.current = { ...cursorPositions.raw }; // Use raw position for panning
+    (event: MouseEvent) => {
+      const transformedPos = {
+        x: roundToTwoDecimals(cursorPositions.transformed.x),
+        y: roundToTwoDecimals(cursorPositions.transformed.y),
+      };
+      const buttonPressed =
+        event.button === 2 || (event.ctrlKey && event.button === 0)
+          ? "right"
+          : "left";
+
+      setCanvasState((prevState) => ({
+        ...prevState,
+        mouseButton: buttonPressed,
+      }));
+
+      if (buttonPressed === "right") {
+        startPanPosition.current = { ...cursorPositions.raw };
       } else {
-        const clickedNode = findNodeAtClick(transformedPos, activeGraph?.nodes);
-        if (clickedNode) {
-          if (event.shiftKey) {
-            addToSelection(clickedNode, setActiveGraph, activeGraph);
-          } else {
-            // Replace selection
-            // TODO: clear other selections
-            addToSelection(clickedNode, setActiveGraph, activeGraph);
-          }
-        } else {
-          isSelecting.current = true;
+        const clickedNode = findNodeAtClick(transformedPos, activeGraph.nodes);
+        if (!clickedNode) {
+          mouseButton.current = "left";
           selectionBoxStart.current = transformedPos;
-          setIsSelecting(true);
-          setSelectionStart(transformedPos);
-          setSelectionEnd(transformedPos);
+          setCanvasState((prevState) => ({
+            ...prevState,
+            selectionStart: transformedPos,
+            selectionEnd: transformedPos,
+          }));
         }
+        // Implement node selection logic if clickedNode is not null
       }
     },
-    [
-      cursorPositions,
-      setSelectionStart,
-      setSelectionEnd,
-      setIsSelecting,
-      setIsPanning,
-      setActiveGraph,
-      activeGraph,
-    ]
+    [cursorPositions, setCanvasState, activeGraph]
   );
 
-  const handleMouseMove = useCallback(
-    (event: React.MouseEvent<HTMLCanvasElement>) => {
-      if (isPanning.current) {
-        const dx = cursorPositions.raw.x - startPanPosition.current.x;
-        const dy = cursorPositions.raw.y - startPanPosition.current.y;
-        setOffset({
-          x: offset.x + dx,
-          y: offset.y + dy,
-        });
-        startPanPosition.current = { ...cursorPositions.raw };
-      } else if (isSelecting.current) {
-        const transformedPos = { ...cursorPositions.transformed };
-        selectionBoxEnd.current = transformedPos;
-        setSelectionEnd(transformedPos);
-      }
-    },
-    [cursorPositions, offset, setOffset, setSelectionEnd]
-  );
+  const handleMouseMove = useCallback(() => {
+    if (canvasState.mouseButton === "right") {
+      const dx = cursorPositions.raw.x - startPanPosition.current.x;
+      const dy = cursorPositions.raw.y - startPanPosition.current.y;
+      setCanvasState((prevState) => ({
+        ...prevState,
+        offset: {
+          x: roundToTwoDecimals(prevState.offset.x + dx),
+          y: roundToTwoDecimals(prevState.offset.y + dy),
+        },
+      }));
+      startPanPosition.current = { ...cursorPositions.raw };
+    } else if (mouseButton.current === "left") {
+      const transformedPos = {
+        x: roundToTwoDecimals(cursorPositions.transformed.x),
+        y: roundToTwoDecimals(cursorPositions.transformed.y),
+      };
+      selectionBoxEnd.current = transformedPos;
+      setCanvasState((prevState) => ({
+        ...prevState,
+        selectionEnd: transformedPos,
+      }));
+    }
+  }, [cursorPositions, setCanvasState, canvasState.mouseButton]);
 
   const handleMouseUp = useCallback(() => {
-    const wasSelecting = isSelecting.current;
-    setIsPanning(false);
-    isPanning.current = false;
-    setIsSelecting(false);
-    isSelecting.current = false;
-
-    if (wasSelecting) {
-      const selectedNodes = findNodesInSelectionBox(
-        selectionBoxStart.current,
-        selectionBoxEnd.current
-      );
-      if (selectedNodes) addMultipleToSelection(selectedNodes);
-    }
-  }, [setIsSelecting, setIsPanning]);
+    setCanvasState((prevState) => ({
+      ...prevState,
+      mouseButton: null,
+    }));
+    mouseButton.current = null;
+  }, [setCanvasState]);
 
   const handleWheel = useCallback(
     (event: WheelEvent) => {
       event.preventDefault();
       const zoomSpeed = 0.01;
       const zoomIncrement = event.deltaY * -zoomSpeed;
-
       let newZoomLevel = zoomLevel + zoomIncrement;
       newZoomLevel = Math.max(newZoomLevel, 0.6);
       newZoomLevel = Math.min(newZoomLevel, 1.6);
 
       if (newZoomLevel !== zoomLevel) {
-        const { x: canvasX, y: canvasY } = cursorPositions.transformed;
-        const newOffsetX = cursorPositions.raw.x - canvasX * newZoomLevel;
-        const newOffsetY = cursorPositions.raw.y - canvasY * newZoomLevel;
-        setZoomLevel(newZoomLevel);
-        setOffset({ x: newOffsetX, y: newOffsetY });
+        const transformedPos = {
+          x: roundToTwoDecimals(cursorPositions.transformed.x),
+          y: roundToTwoDecimals(cursorPositions.transformed.y),
+        };
+        const newOffsetX =
+          cursorPositions.raw.x - transformedPos.x * newZoomLevel;
+        const newOffsetY =
+          cursorPositions.raw.y - transformedPos.y * newZoomLevel;
+        setCanvasState((prevState) => ({
+          ...prevState,
+          zoomLevel: roundToTwoDecimals(newZoomLevel),
+          offset: {
+            x: roundToTwoDecimals(newOffsetX),
+            y: roundToTwoDecimals(newOffsetY),
+          },
+        }));
       }
     },
-    [
-      cursorPositions.raw,
-      cursorPositions.transformed,
-      zoomLevel,
-      setZoomLevel,
-      setOffset,
-    ]
+    [cursorPositions, setCanvasState, zoomLevel]
   );
 
   const handleContextMenu = useCallback((event: MouseEvent) => {

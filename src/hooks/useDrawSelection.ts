@@ -17,7 +17,8 @@ const useDrawSelection = (
   offset: Offset,
   canvasSize: CanvasSize
 ) => {
-  const { selectionStart, selectionEnd, isSelecting } = useCanvasContext();
+  const { canvasState } = useCanvasContext();
+  const { selectionStart, selectionEnd, mouseButton } = canvasState;
 
   const drawSelection = useCallback(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -25,7 +26,7 @@ const useDrawSelection = (
       // Clear any previous drawing on the canvas
       ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
 
-      if (isSelecting && selectionStart && selectionEnd) {
+      if (mouseButton === "left" && selectionStart && selectionEnd) {
         // Calculate scaled positions
         const startX = selectionStart.x * zoomLevel + offset.x;
         const startY = selectionStart.y * zoomLevel + offset.y;
@@ -45,7 +46,7 @@ const useDrawSelection = (
     canvasRef,
     selectionStart,
     selectionEnd,
-    isSelecting,
+    mouseButton,
     zoomLevel,
     offset,
     canvasSize,

@@ -14,7 +14,8 @@ const Canvas = () => {
   const mainCanvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { zoomLevel, offset } = useCanvasContext();
+  const { canvasState } = useCanvasContext();
+  const { zoomLevel, offset } = canvasState;
 
   const cursorPositions = useCursorPositions(
     selectionCanvasRef,
@@ -31,7 +32,14 @@ const Canvas = () => {
     handleContextMenu,
   } = useCanvasInteractions(cursorPositions);
 
-  useCanvasEventListeners(selectionCanvasRef, handleContextMenu, handleWheel);
+  useCanvasEventListeners(
+    selectionCanvasRef,
+    handleContextMenu,
+    handleWheel,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp
+  );
   useCursorStyle(selectionCanvasRef);
 
   useDrawBackground(backgroundCanvasRef, zoomLevel, offset, canvasSize);
@@ -58,9 +66,6 @@ const Canvas = () => {
         style={{ position: "absolute", top: 0, left: 0, zIndex: 3 }}
         width={canvasSize.width}
         height={canvasSize.height}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
       />
     </div>
   );

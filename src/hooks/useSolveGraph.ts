@@ -45,7 +45,8 @@ function deepEqual<T>(obj1: T, obj2: T): boolean {
 }
 
 const useSolveGraph = () => {
-  const { activeGraph, setActiveGraph } = useCanvasContext();
+  const { canvasState, setCanvasState } = useCanvasContext();
+  const { activeGraph } = canvasState;
   const previousGraphRef = useRef<GraphData | undefined>(undefined);
 
   const executeNode = useCallback(
@@ -93,10 +94,10 @@ const useSolveGraph = () => {
       previousGraphRef.current === undefined ||
       !deepEqual<GraphData>(previousGraphRef.current, graphCopy)
     ) {
-      setActiveGraph(graphCopy);
+      setCanvasState((prevState) => ({ ...prevState, activeGraph: graphCopy }));
       previousGraphRef.current = graphCopy;
     }
-  }, [activeGraph, executeNode, setActiveGraph]);
+  }, [activeGraph, executeNode, setCanvasState]);
 
   return solveGraph;
 };

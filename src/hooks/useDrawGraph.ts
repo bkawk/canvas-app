@@ -12,7 +12,9 @@ const useDrawGraph = (
   offset: Offset,
   canvasSize: CanvasSize
 ) => {
-  const { activeGraph } = useCanvasContext();
+  const { canvasState } = useCanvasContext();
+  const { activeGraph } = canvasState;
+
   const solveGraph = useSolveGraph();
 
   const drawGraph = useCallback(() => {

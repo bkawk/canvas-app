@@ -61,62 +61,43 @@ export interface Offset {
 
 interface CanvasContextProps {
   zoomLevel: number;
-  setZoomLevel: (zoomLevel: number) => void;
   offset: Offset;
-  setOffset: (offset: Offset) => void;
-  selectionStart: Position | null;
-  setSelectionStart: (selectionStart: Position | null) => void;
-  selectionEnd: Position | null;
-  setSelectionEnd: (selectionEnd: Position | null) => void;
-  isSelecting: boolean;
-  setIsSelecting: (isSelecting: boolean) => void;
-  isPanning: boolean;
-  setIsPanning: (isPanning: boolean) => void;
   activeGraph: GraphData;
-  setActiveGraph: (activeGraph: GraphData) => void;
+
+  mouseButton: "left" | "right" | null;
+  selectionStart: Position | null;
+  selectionEnd: Position | null;
 }
 
-const CanvasContext = createContext<CanvasContextProps | undefined>(undefined);
+const CanvasContext = createContext<
+  | {
+      canvasState: CanvasContextProps;
+      setCanvasState: React.Dispatch<React.SetStateAction<CanvasContextProps>>;
+    }
+  | undefined
+>(undefined);
 
 const CanvasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [zoomLevel, setZoomLevel] = useState<number>(1);
-  const [offset, setOffset] = useState<Offset>({
-    x: 0,
-    y: 0,
-  });
-  const [selectionStart, setSelectionStart] = useState<Position | null>(null);
-  const [selectionEnd, setSelectionEnd] = useState<Position | null>(null);
-  const [isSelecting, setIsSelecting] = useState<boolean>(false);
-  const [isPanning, setIsPanning] = useState<boolean>(false);
-
-  const [activeGraph, setActiveGraph] = useState<GraphData>(() => {
-    const savedData = localStorage.getItem("activeGraph");
-    return savedData ? JSON.parse(savedData) : initialData;
+  const [canvasState, setCanvasState] = useState<any>({
+    zoomLevel: 1,
+    offset: { x: 0, y: 0 },
+    activeGraph: localStorage.getItem("activeGraph")
+      ? JSON.parse(localStorage.getItem("activeGraph") as string)
+      : initialData,
+    mouseButton: null,
+    selectionStart: null,
+    selectionEnd: null,
   });
 
   useEffect(() => {
-    localStorage.setItem("activeGraph", JSON.stringify(activeGraph));
-  }, [activeGraph]);
+    localStorage.setItem(
+      "activeGraph",
+      JSON.stringify(canvasState.activeGraph)
+    );
+  }, [canvasState.activeGraph]);
 
   return (
-    <CanvasContext.Provider
-      value={{
-        zoomLevel,
-        setZoomLevel,
-        offset,
-        setOffset,
-        selectionStart,
-        setSelectionStart,
-        selectionEnd,
-        setSelectionEnd,
-        isSelecting,
-        setIsSelecting,
-        isPanning,
-        setIsPanning,
-        activeGraph,
-        setActiveGraph,
-      }}
-    >
+    <CanvasContext.Provider value={{ canvasState, setCanvasState }}>
       {children}
     </CanvasContext.Provider>
   );
