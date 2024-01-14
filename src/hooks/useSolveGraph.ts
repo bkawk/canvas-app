@@ -1,19 +1,10 @@
-// hooks/useSolveGraph.ts
-import { useCallback, useRef } from "react";
+import { useRef, useCallback } from "react";
 import {
-  useCanvasContext,
-  Node,
   GraphData,
-  Edge,
-  OutputPin,
-} from "../context/useCanvasContext";
+  Node,
+  useActiveGraphContext,
+} from "../context/useActiveGraphContext";
 import { multiplyAxB } from "../functions/multiplyAxB";
-
-type NodeFunctionName = "multiplyAxB";
-
-const functionMap: Record<NodeFunctionName, (inputs: number[]) => number> = {
-  multiplyAxB: multiplyAxB,
-};
 
 function deepEqual<T>(obj1: T, obj2: T): boolean {
   if (obj1 === obj2) {
@@ -43,10 +34,14 @@ function deepEqual<T>(obj1: T, obj2: T): boolean {
 
   return true;
 }
+type NodeFunctionName = "multiplyAxB";
 
-const useSolveGraph = () => {
-  const { canvasState, setCanvasState } = useCanvasContext();
-  const { activeGraph } = canvasState;
+const functionMap: Record<NodeFunctionName, (inputs: number[]) => number> = {
+  multiplyAxB,
+};
+
+export const useSolveGraph = () => {
+  const { activeGraph, setActiveGraph } = useActiveGraphContext();
   const previousGraphRef = useRef<GraphData | undefined>(undefined);
 
   const executeNode = useCallback(
@@ -55,18 +50,17 @@ const useSolveGraph = () => {
       if (nodeFunction) {
         const inputValues = node.pins.input?.map((inputPin) => {
           const edge = activeGraph.edges.find(
-            (edge: Edge) => edge.toPin === inputPin.id
+            (edge) => edge.toPin === inputPin.id
           );
-          const fromNode = activeGraph.nodes.find((n: Node) =>
-            n.pins.output?.some((p: OutputPin) => p.id === edge?.fromPin)
+          const fromNode = activeGraph.nodes.find((n) =>
+            n.pins.output?.some((p) => p.id === edge?.fromPin)
           );
-          return fromNode?.pins.output?.find(
-            (p: OutputPin) => p.id === edge?.fromPin
-          )?.value;
+          return fromNode?.pins.output?.find((p) => p.id === edge?.fromPin)
+            ?.value;
         });
 
         if (inputValues) {
-          const result = nodeFunction(inputValues);
+          const result = nodeFunction(inputValues as number[]);
           const outputPin = node.pins.output?.[0];
           if (outputPin) {
             outputPin.value = result;
@@ -82,9 +76,9 @@ const useSolveGraph = () => {
 
   const solveGraph = useCallback(() => {
     if (!activeGraph) return;
-    const graphCopy: GraphData = JSON.parse(JSON.stringify(activeGraph));
+    const graphCopy = JSON.parse(JSON.stringify(activeGraph));
 
-    graphCopy.nodes.forEach((node) => {
+    graphCopy.nodes.forEach((node: Node) => {
       if (node.function && node.function in functionMap) {
         executeNode(node, graphCopy.nodes);
       }
@@ -92,12 +86,12 @@ const useSolveGraph = () => {
 
     if (
       previousGraphRef.current === undefined ||
-      !deepEqual<GraphData>(previousGraphRef.current, graphCopy)
+      !deepEqual(previousGraphRef.current, graphCopy)
     ) {
-      setCanvasState((prevState) => ({ ...prevState, activeGraph: graphCopy }));
+      setActiveGraph(graphCopy);
       previousGraphRef.current = graphCopy;
     }
-  }, [activeGraph, executeNode, setCanvasState]);
+  }, [activeGraph, executeNode, setActiveGraph]);
 
   return solveGraph;
 };

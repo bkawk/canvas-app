@@ -1,21 +1,18 @@
 import { useEffect, RefObject, useCallback } from "react";
-import { useCanvasContext, Offset, Node } from "../context/useCanvasContext";
+import { Position } from "../context/useCanvasContext";
+import { useActiveGraphContext, Node } from "../context/useActiveGraphContext";
 import { drawNodes } from "../utils/drawNodes";
 import { drawPins } from "../utils/drawPins";
 import { drawEdges } from "../utils/drawEdges";
 import { CanvasSize } from "./useCanvasResizer";
-import useSolveGraph from "../hooks/useSolveGraph";
 
 const useDrawGraph = (
   canvasRef: RefObject<HTMLCanvasElement>,
   zoomLevel: number,
-  offset: Offset,
+  offset: Position,
   canvasSize: CanvasSize
 ) => {
-  const { canvasState } = useCanvasContext();
-  const { activeGraph } = canvasState;
-
-  const solveGraph = useSolveGraph();
+  const { activeGraph } = useActiveGraphContext();
 
   const drawGraph = useCallback(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -39,10 +36,6 @@ const useDrawGraph = (
   useEffect(() => {
     drawGraph();
   }, [drawGraph]);
-
-  useEffect(() => {
-    solveGraph();
-  }, [activeGraph, solveGraph]);
 
   return drawGraph;
 };

@@ -1,10 +1,10 @@
-import { Node, Offset } from "../context/useCanvasContext";
+import { Node, Position } from "../context/useActiveGraphContext";
 
 export const drawNodes = (
   ctx: CanvasRenderingContext2D,
   node: Node,
   zoomLevel: number,
-  offset: Offset
+  offset: Position
 ) => {
   const nodeWidth = 150;
   const nodeHeight = 60;

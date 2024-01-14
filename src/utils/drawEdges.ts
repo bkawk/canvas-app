@@ -1,12 +1,13 @@
-import { Edge, Node, Offset } from "../context/useCanvasContext";
 import { findPinPosition } from "./graphUtils";
+
+import { Position, Node, Edge } from "../context/useActiveGraphContext";
 
 export const drawEdges = (
   ctx: CanvasRenderingContext2D,
   edges: Edge[],
   nodes: Node[],
   zoomLevel: number,
-  offset: Offset
+  offset: Position
 ) => {
   edges.forEach((edge: Edge) => {
     const nodeHeight = 60;

@@ -1,4 +1,4 @@
-import { Node, Position, Offset } from "../context/useCanvasContext";
+import { Node, Position } from "../context/useActiveGraphContext";
 
 export function findNodeAtClick(
   position: Position,
@@ -44,7 +44,7 @@ export const findPinPosition = (
   isOutput: boolean,
   nodes: Node[],
   zoomLevel: number,
-  offset: Offset,
+  offset: Position,
   nodeHeight: number
 ) => {
   const node = nodes.find((node) =>

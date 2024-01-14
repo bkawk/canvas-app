@@ -1,4 +1,4 @@
-import { GraphData, Node } from "../context/useCanvasContext";
+import { Node, GraphData } from "../context/useActiveGraphContext";
 
 export function addToSelection(
   node: Node,

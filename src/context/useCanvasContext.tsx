@@ -5,70 +5,20 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import initialData from "../data/initialData.json";
 
 export interface Position {
   x: number;
   y: number;
 }
 
-export interface InputPin {
-  id: string;
-  type: string;
-}
-
-export interface OutputPin {
-  id: string;
-  type: string;
-  solved: boolean;
-  value?: any;
-  error?: any;
-}
-
-export interface ErrorPin {
-  id: string;
-  type: string;
-  solved: boolean;
-  value: any;
-}
-
-export interface Node {
-  id: string;
-  type: string;
-  function?: string;
-  selected: boolean;
-  position: Position;
-  pins: {
-    input?: InputPin[];
-    output?: OutputPin[];
-  };
-}
-
-export interface Edge {
-  fromPin: string;
-  toPin: string;
-}
-
-export interface GraphData {
-  nodes: Node[];
-  edges: Edge[];
-}
-
-export interface Offset {
-  x: number;
-  y: number;
-}
-
 export interface CanvasContextProps {
   zoomLevel: number;
-  offset: Offset;
-  activeGraph: GraphData;
+  offset: Position;
   mouseButton: "left" | "right" | null;
   dragStart: Position;
-  dragEnd: Position;
-  downTime: number | null;
-  upTime: number | null;
+  dragEnd: Position | null;
   keyPressed: "escape" | "shift" | "backspace" | null;
+  eventType: "click" | "drag" | null;
 }
 
 const CanvasContext = createContext<
@@ -83,15 +33,11 @@ const CanvasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [canvasState, setCanvasState] = useState<any>({
     zoomLevel: 1,
     offset: { x: 0, y: 0 },
-    activeGraph: localStorage.getItem("activeGraph")
-      ? JSON.parse(localStorage.getItem("activeGraph") as string)
-      : initialData,
     mouseButton: null,
     dragStart: { x: 0, y: 0 },
     dragEnd: { x: 0, y: 0 },
-    downTime: null,
-    upTime: null,
     keyPressed: null,
+    eventType: null,
   });
 
   useEffect(() => {
@@ -117,3 +63,5 @@ const useCanvasContext = () => {
 };
 
 export { CanvasProvider, useCanvasContext, CanvasContext };
+
+export default useCanvasContext;

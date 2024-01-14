@@ -20,10 +20,13 @@ const useCanvasEventListeners = (
   handleKeyDown: (event: KeyboardEvent) => void,
   handleKeyUp: (event: KeyboardEvent) => void
 ) => {
+  // Memoize the handleMouseMove function
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      const throttledMouseMove = throttle(handleMouseMove, 100);
+      const throttledMouseMove = throttle(handleMouseMove, 20);
+
       canvas.addEventListener("contextmenu", handleContextMenu, {
         passive: false,
       });
@@ -32,6 +35,7 @@ const useCanvasEventListeners = (
       canvas.addEventListener("mousemove", throttledMouseMove);
       canvas.addEventListener("mouseup", handleMouseUp);
 
+      // Cleanup function for the effect
       return () => {
         canvas.removeEventListener("contextmenu", handleContextMenu);
         canvas.removeEventListener("wheel", handleWheel);
@@ -53,6 +57,7 @@ const useCanvasEventListeners = (
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
+    // Cleanup function for the effect
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
