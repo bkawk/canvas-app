@@ -1,21 +1,11 @@
 import { useEffect, RefObject, useCallback } from "react";
-
-interface CanvasSize {
-  width: number;
-  height: number;
-}
-
-interface Offset {
-  x: number;
-  y: number;
-}
+import { useCanvasContext } from "../context/useCanvasContext";
 
 const useDrawBackground = (
-  backgroundCanvasRef: RefObject<HTMLCanvasElement>,
-  zoomLevel: number,
-  offset: Offset,
-  canvasSize: CanvasSize
+  backgroundCanvasRef: RefObject<HTMLCanvasElement>
 ) => {
+  const { canvasState } = useCanvasContext();
+  const { zoomLevel, offset, canvasSize } = canvasState;
   const drawGrid = useCallback(
     (
       ctx: CanvasRenderingContext2D,

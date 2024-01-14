@@ -1,6 +1,6 @@
 import { findPinPosition } from "./graphUtils";
 
-import { Position, Node, Edge } from "../context/useActiveGraphContext";
+import { Position, Node, Edge } from "../context/useGraphContext";
 
 export const drawEdges = (
   ctx: CanvasRenderingContext2D,

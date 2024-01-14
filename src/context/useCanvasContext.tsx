@@ -10,6 +10,10 @@ export interface Position {
   x: number;
   y: number;
 }
+export interface Size {
+  width: number;
+  height: number;
+}
 
 export interface CanvasContextProps {
   zoomLevel: number;
@@ -19,6 +23,7 @@ export interface CanvasContextProps {
   dragEnd: Position | null;
   keyPressed: "escape" | "shift" | "backspace" | null;
   eventType: "click" | "drag" | null;
+  canvasSize: Size;
 }
 
 const CanvasContext = createContext<
@@ -38,14 +43,12 @@ const CanvasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     dragEnd: { x: 0, y: 0 },
     keyPressed: null,
     eventType: null,
+    canvasSize: { width: 0, height: 0 },
   });
 
   useEffect(() => {
-    localStorage.setItem(
-      "activeGraph",
-      JSON.stringify(canvasState.activeGraph)
-    );
-  }, [canvasState.activeGraph]);
+    localStorage.setItem("Graph", JSON.stringify(canvasState.Graph));
+  }, [canvasState.Graph]);
 
   return (
     <CanvasContext.Provider value={{ canvasState, setCanvasState }}>

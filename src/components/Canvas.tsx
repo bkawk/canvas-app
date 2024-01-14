@@ -1,15 +1,12 @@
-import React, { useRef, useEffect } from "react";
-import useCanvasResizer from "../hooks/useCanvasResizer";
-import useCursorPositions from "../hooks/useCursorPositions";
+import { useRef } from "react";
 import useCursorStyle from "../hooks/useCursorStyle";
 import useCanvasInteractions from "../hooks/useCanvasInteractions";
 import useDrawBackground from "../hooks/useDrawBackground";
 import useDrawSelection from "../hooks/useDrawSelection";
 import useDrawGraph from "../hooks/useDrawGraph";
-import useCanvasContext from "../context/useCanvasContext";
 import useCanvasEventListeners from "../hooks/useCanvasEventListeners";
 import useSolveGraph from "../hooks/useSolveGraph";
-import useUpdateActiveGraph from "../hooks/useUpdateActiveGraph";
+import { useCanvasContext } from "../context/useCanvasContext";
 
 const Canvas = () => {
   const selectionCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,15 +14,7 @@ const Canvas = () => {
   const backgroundCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const { canvasState } = useCanvasContext();
-  const { zoomLevel, offset } = canvasState;
-
-  // const solveGraph = useSolveGraph();
-  // useEffect(() => {
-  //   solveGraph();
-  // }, [solveGraph]);
-
-  const canvasSize = useCanvasResizer(selectionCanvasRef);
-
+  const { canvasSize } = canvasState;
   const {
     handleMouseDown,
     handleMouseMove,
@@ -34,6 +23,7 @@ const Canvas = () => {
     handleContextMenu,
     handleKeyDown,
     handleKeyUp,
+    handleResize,
   } = useCanvasInteractions(selectionCanvasRef);
 
   useCanvasEventListeners(
@@ -44,14 +34,15 @@ const Canvas = () => {
     handleMouseMove,
     handleMouseUp,
     handleKeyDown,
-    handleKeyUp
+    handleKeyUp,
+    handleResize
   );
 
   useCursorStyle(selectionCanvasRef);
-  useDrawBackground(backgroundCanvasRef, zoomLevel, offset, canvasSize);
-  useDrawSelection(selectionCanvasRef, zoomLevel, offset, canvasSize);
-  useDrawGraph(mainCanvasRef, zoomLevel, offset, canvasSize);
-  // useUpdateActiveGraph();
+  useDrawBackground(backgroundCanvasRef);
+  useDrawSelection(selectionCanvasRef);
+  useDrawGraph(mainCanvasRef);
+  useSolveGraph();
 
   return (
     <div className="canvas-container">
@@ -70,7 +61,6 @@ const Canvas = () => {
       <canvas
         ref={selectionCanvasRef}
         className="selection-canvas"
-        style={{ position: "absolute", top: 0, left: 0, zIndex: 3 }}
         width={canvasSize.width}
         height={canvasSize.height}
       />

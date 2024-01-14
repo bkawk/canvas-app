@@ -1,4 +1,4 @@
-import { Node, Position } from "../context/useActiveGraphContext";
+import { Node, Position } from "../context/useGraphContext";
 
 export function findNodeAtClick(
   position: Position,

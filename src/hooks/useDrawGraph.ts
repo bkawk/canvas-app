@@ -1,37 +1,26 @@
 import { useEffect, RefObject, useCallback } from "react";
-import { Position } from "../context/useCanvasContext";
-import { useActiveGraphContext, Node } from "../context/useActiveGraphContext";
+import { useGraphContext, Node } from "../context/useGraphContext";
 import { drawNodes } from "../utils/drawNodes";
 import { drawPins } from "../utils/drawPins";
 import { drawEdges } from "../utils/drawEdges";
-import { CanvasSize } from "./useCanvasResizer";
+import { useCanvasContext } from "../context/useCanvasContext";
 
-const useDrawGraph = (
-  canvasRef: RefObject<HTMLCanvasElement>,
-  zoomLevel: number,
-  offset: Position,
-  canvasSize: CanvasSize
-) => {
-  const { activeGraph } = useActiveGraphContext();
+const useDrawGraph = (canvasRef: RefObject<HTMLCanvasElement>) => {
+  const { graph } = useGraphContext();
+  const { canvasState } = useCanvasContext();
+  const { zoomLevel, offset, canvasSize } = canvasState;
 
   const drawGraph = useCallback(() => {
     const ctx = canvasRef.current?.getContext("2d");
-    if (ctx && activeGraph?.nodes) {
+    if (ctx && graph?.nodes) {
       ctx.clearRect(0, 0, canvasSize.width, canvasSize.height);
-      activeGraph.nodes.forEach((node: Node) => {
+      graph.nodes.forEach((node: Node) => {
         if (ctx) drawNodes(ctx, node, zoomLevel, offset);
         if (ctx) drawPins(ctx, node, zoomLevel, offset);
-        if (ctx)
-          drawEdges(
-            ctx,
-            activeGraph.edges,
-            activeGraph.nodes,
-            zoomLevel,
-            offset
-          );
+        if (ctx) drawEdges(ctx, graph.edges, graph.nodes, zoomLevel, offset);
       });
     }
-  }, [canvasRef, activeGraph, zoomLevel, offset, canvasSize]);
+  }, [canvasRef, graph, zoomLevel, offset, canvasSize]);
 
   useEffect(() => {
     drawGraph();

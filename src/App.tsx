@@ -1,14 +1,14 @@
 import React from "react";
 import Canvas from "./components/Canvas";
 import { CanvasProvider } from "./context/useCanvasContext";
-import { ActiveGraphProvider } from "./context/useActiveGraphContext";
+import { GraphProvider } from "./context/useGraphContext";
 
 import "./App.css";
 
 function App() {
   return (
     <CanvasProvider>
-      <ActiveGraphProvider>
+      <GraphProvider>
         <div className="App">
           <header>
             <h1>Canvas App</h1>
@@ -26,7 +26,7 @@ function App() {
             <p>&copy; 2024 Canvas App</p>
           </footer>
         </div>
-      </ActiveGraphProvider>
+      </GraphProvider>
     </CanvasProvider>
   );
 }

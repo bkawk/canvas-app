@@ -3,7 +3,7 @@ import {
   Position,
   OutputPin,
   InputPin,
-} from "../context/useActiveGraphContext";
+} from "../context/useGraphContext";
 
 export const drawPins = (
   ctx: CanvasRenderingContext2D,

@@ -9,6 +9,12 @@ interface CanvasInteractions {
   handleContextMenu: (event: MouseEvent) => void;
   handleKeyDown: (event: KeyboardEvent) => void;
   handleKeyUp: (event: KeyboardEvent) => void;
+  handleResize: (event: UIEvent) => void;
+}
+
+export interface CanvasSize {
+  width: number;
+  height: number;
 }
 
 interface CursorPositions {
@@ -31,6 +37,7 @@ const useCanvasInteractions = (
   const eventType = useRef<"click" | "drag" | null>(null);
   const zoomLevelRef = useRef<number>(canvasState.zoomLevel);
   const offsetRef = useRef<{ x: number; y: number }>(canvasState.offset);
+  const canvasSizeRef = useRef<CanvasSize>({ width: 0, height: 0 });
 
   const cursorPositions = useRef<CursorPositions>({
     raw: { x: 0, y: 0 },
@@ -269,6 +276,23 @@ const useCanvasInteractions = (
     [setCanvasState]
   );
 
+  const handleResize = useCallback(
+    (event: UIEvent) => {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const width = canvas.offsetWidth;
+        const height = canvas.offsetHeight;
+        canvasSizeRef.current = { width, height };
+
+        setCanvasState((prevState) => ({
+          ...prevState,
+          canvasSize: { width, height },
+        }));
+      }
+    },
+    [canvasRef, setCanvasState]
+  );
+
   const handleContextMenu = useCallback((event: MouseEvent) => {
     event.preventDefault();
   }, []);
@@ -281,6 +305,7 @@ const useCanvasInteractions = (
     handleContextMenu,
     handleKeyDown,
     handleKeyUp,
+    handleResize,
   };
 };
 

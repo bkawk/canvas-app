@@ -3,7 +3,7 @@ import { useCanvasContext } from "../context/useCanvasContext";
 
 const useCursorStyle = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
   const { canvasState } = useCanvasContext();
-  const { mouseButton, zoomLevel } = canvasState;
+  const { mouseButton, zoomLevel, eventType } = canvasState;
   const zoomTimeoutRef = useRef<number | null>(null);
   const lastZoomLevel = useRef<number>(zoomLevel);
 
@@ -14,7 +14,7 @@ const useCursorStyle = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     const updateCursorForMouseButton = () => {
       if (mouseButton === "right") {
         canvas.style.cursor = "grabbing";
-      } else if (mouseButton === "left") {
+      } else if (mouseButton === "left" && eventType === "drag") {
         canvas.style.cursor = "crosshair";
       } else {
         canvas.style.cursor = "default";
@@ -34,9 +34,9 @@ const useCursorStyle = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
 
       zoomTimeoutRef.current = window.setTimeout(() => {
         updateCursorForMouseButton();
-      }, 60);
+      }, 100);
     }
-  }, [canvasRef, mouseButton, zoomLevel]);
+  }, [canvasRef, mouseButton, zoomLevel, eventType]);
 
   useEffect(() => {
     return () => {

@@ -1,16 +1,16 @@
-import { Node, GraphData } from "../context/useActiveGraphContext";
+import { Node, GraphData } from "../context/useGraphContext";
 
 export function addToSelection(
   node: Node,
-  setActiveGraph: (graphData: GraphData) => void,
-  activeGraph: GraphData
+  setGraph: (graphData: GraphData) => void,
+  Graph: GraphData
 ): void {
   console.log("addToSelection");
 
-  // Clone the activeGraph to avoid direct state mutation
-  const updatedGraph = { ...activeGraph, nodes: [...activeGraph.nodes] };
+  // Clone the Graph to avoid direct state mutation
+  const updatedGraph = { ...Graph, nodes: [...Graph.nodes] };
 
-  // Find the node in the activeGraph and toggle its selected state
+  // Find the node in the Graph and toggle its selected state
   const nodeIndex = updatedGraph.nodes.findIndex((n) => n.id === node.id);
   if (nodeIndex !== -1) {
     const isCurrentlySelected = updatedGraph.nodes[nodeIndex].selected;
@@ -20,8 +20,8 @@ export function addToSelection(
     };
   }
 
-  // Save the updated graph back using setActiveGraph
-  setActiveGraph(updatedGraph);
+  // Save the updated graph back using setGraph
+  setGraph(updatedGraph);
 }
 
 export function addMultipleToSelection(node: Node[]): void {
