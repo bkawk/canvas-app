@@ -6,7 +6,8 @@ import useDrawSelection from "../hooks/useDrawSelection";
 import useDrawGraph from "../hooks/useDrawGraph";
 import useCanvasEventListeners from "../hooks/useCanvasEventListeners";
 import useSolveGraph from "../hooks/useSolveGraph";
-import { useCanvasContext } from "../context/useCanvasContext";
+import useUpdateGraph from "../hooks/useUpdateGraph";
+import useCanvasContext from "../context/useCanvasContext";
 
 const Canvas = () => {
   const selectionCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -43,6 +44,7 @@ const Canvas = () => {
   useDrawSelection(selectionCanvasRef);
   useDrawGraph(mainCanvasRef);
   useSolveGraph();
+  useUpdateGraph();
 
   return (
     <div className="canvas-container">

@@ -46,10 +46,6 @@ const CanvasProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     canvasSize: { width: 0, height: 0 },
   });
 
-  useEffect(() => {
-    localStorage.setItem("Graph", JSON.stringify(canvasState.Graph));
-  }, [canvasState.Graph]);
-
   return (
     <CanvasContext.Provider value={{ canvasState, setCanvasState }}>
       {children}
