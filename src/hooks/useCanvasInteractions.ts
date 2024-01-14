@@ -51,7 +51,6 @@ const useCanvasInteractions = (
         const rawX = event.clientX - rect.left;
         const rawY = event.clientY - rect.top;
 
-        // Use the current values from the refs for zoomLevel and offset
         const transformedX = roundToTwoDecimals(
           (rawX - offsetRef.current.x) / zoomLevelRef.current
         );
@@ -65,7 +64,7 @@ const useCanvasInteractions = (
         };
       }
     },
-    [canvasRef] // No dependencies needed as all values are refs or constants
+    [canvasRef]
   );
 
   const handleMouseDown = useCallback(
@@ -80,16 +79,11 @@ const useCanvasInteractions = (
           ? "right"
           : "left";
 
-      setCanvasState((prevState) => ({
-        ...prevState,
-        mouseButton: buttonPressed,
-      }));
+      mouseButton.current = buttonPressed;
 
       if (buttonPressed === "right") {
-        mouseButton.current = "right";
         startPanPosition.current = { ...cursorPositions.current.raw };
       } else {
-        mouseButton.current = "left";
         selectionBoxStart.current = transformedPos;
         setCanvasState((prevState) => ({
           ...prevState,
@@ -103,12 +97,11 @@ const useCanvasInteractions = (
 
   const handleMouseMove = useCallback(
     (event: MouseEvent) => {
-      const canvasElement = canvasRef.current; // Ensure canvasRef is defined and refers to your canvas element
+      const canvasElement = canvasRef.current;
       if (canvasElement) {
         updateCursorPositions(event);
 
         if (mouseButton.current === "right") {
-          // Logic for handling right mouse button movement (panning)
           const dx = cursorPositions.current.raw.x - startPanPosition.current.x;
           const dy = cursorPositions.current.raw.y - startPanPosition.current.y;
 
@@ -135,7 +128,6 @@ const useCanvasInteractions = (
 
           startPanPosition.current = { ...cursorPositions.current.raw };
         } else if (mouseButton.current === "left") {
-          // Logic for handling left mouse button movement (selection or dragging)
           const dragDistance =
             Math.abs(
               cursorPositions.current.transformed.x -
@@ -150,6 +142,7 @@ const useCanvasInteractions = (
             setCanvasState((prevState) => ({
               ...prevState,
               eventType: "drag",
+              mouseButton: "left",
             }));
           }
           const transformedPos = {
@@ -163,10 +156,9 @@ const useCanvasInteractions = (
             dragEnd: transformedPos,
           }));
         }
-        // Additional logic for handleMouseMove can be added here if needed
       }
     },
-    [updateCursorPositions, setCanvasState, canvasRef] // Removed cursorPositions from dependencies as it's a ref
+    [updateCursorPositions, setCanvasState, canvasRef]
   );
 
   const handleMouseUp = useCallback(
@@ -176,22 +168,20 @@ const useCanvasInteractions = (
         eventType.current = "click";
         setCanvasState((prevState) => ({
           ...prevState,
+          mouseButton: mouseButton.current,
           eventType: "click",
           dragEnd: null,
         }));
       }
       setTimeout(() => {
         eventType.current = null;
+        mouseButton.current = null;
         setCanvasState((prevState) => ({
           ...prevState,
+          mouseButton: null,
           eventType: null,
         }));
-      }, 30);
-      setCanvasState((prevState) => ({
-        ...prevState,
-        mouseButton: null,
-      }));
-      mouseButton.current = null;
+      }, 50);
     },
     [setCanvasState]
   );
@@ -206,7 +196,6 @@ const useCanvasInteractions = (
       const zoomSpeed = 0.01;
       const zoomIncrement = event.deltaY * -zoomSpeed;
 
-      // Calculate new zoom level
       let newZoomLevel = zoomLevelRef.current + zoomIncrement;
       newZoomLevel = Math.max(newZoomLevel, 0.6);
       newZoomLevel = Math.min(newZoomLevel, 1.6);
@@ -216,11 +205,9 @@ const useCanvasInteractions = (
         const cursorX = event.clientX - rect.left;
         const cursorY = event.clientY - rect.top;
 
-        // Calculate the point on the canvas where the cursor is pointing, relative to the current zoom level and offset
         const pointX = (cursorX - offsetRef.current.x) / zoomLevelRef.current;
         const pointY = (cursorY - offsetRef.current.y) / zoomLevelRef.current;
 
-        // Calculate the new offset to keep the point under the cursor stationary
         const newOffsetX = cursorX - pointX * newZoomLevel;
         const newOffsetY = cursorY - pointY * newZoomLevel;
 
@@ -243,7 +230,7 @@ const useCanvasInteractions = (
         }
       }
     },
-    [setCanvasState, canvasRef] // Dependencies updated
+    [setCanvasState, canvasRef]
   );
 
   const handleKeyDown = useCallback(

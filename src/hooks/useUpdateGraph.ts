@@ -7,9 +7,6 @@ const useUpdateGraph = () => {
   const { graph, setGraph } = useGraphContext();
 
   useEffect(() => {
-    console.log("canvasState.mouseButton", canvasState.mouseButton);
-    console.log("canvasState.eventType", canvasState.eventType);
-    console.log("--------");
     if (
       canvasState.mouseButton === "left" &&
       canvasState.eventType === "click"
