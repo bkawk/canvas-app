@@ -92,7 +92,7 @@ const useCanvasInteractions = (
         }));
       }
     },
-    [cursorPositions, setCanvasState]
+    [setCanvasState]
   );
 
   const handleMouseMove = useCallback(
@@ -151,10 +151,16 @@ const useCanvasInteractions = (
           };
           selectionBoxEnd.current = transformedPos;
 
-          setCanvasState((prevState) => ({
-            ...prevState,
-            dragEnd: transformedPos,
-          }));
+          if (
+            transformedPos.x !== selectionBoxEnd.current.x ||
+            transformedPos.y !== selectionBoxEnd.current.y
+          ) {
+            selectionBoxEnd.current = transformedPos;
+            setCanvasState((prevState) => ({
+              ...prevState,
+              dragEnd: transformedPos,
+            }));
+          }
         }
       }
     },
